@@ -32,8 +32,7 @@ module.exports = function (auth_token) {
     var path = '/users/me/goals/'+goalname+'/datapoints.json'
     // not using object literal notation because it causes
     // querystring to insert 'param=' if param is undefined
-    obj = {};
-    self.callApi(path, obj, 'POST', callback)
+    self.callApi(path, params, 'POST', callback)
   }
 
   this.callApi = function (path, obj, method, callback) {
