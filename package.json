@@ -1,0 +1,26 @@
+{
+  "name": "beeminder",
+  "version": "0.0.0",
+  "description": "NodeJS wrapper for the Beeminder API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/malcolmocean/beeminderjs.git"
+  },
+  "keywords": [
+    "beeminder",
+    "beeminderjs",
+    "api"
+  ],
+  "author": "Malcolm Ocean <malcolm@malcolmocean.com> (http://malcolmocean.com/)",
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/malcolmocean/beeminderjs/issues"
+  },
+  "dependencies": {
+    "curlrequest": "~0.5.1"
+  }
+}
