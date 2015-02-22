@@ -1,6 +1,6 @@
 {
   "name": "beeminder",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "NodeJS wrapper for the Beeminder API",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,11 @@
     "url": "https://github.com/malcolmocean/beeminderjs/issues"
   },
   "dependencies": {
-    "curlrequest": "~0.5.1"
+    "curlrequest": "~0.5.1",
+    "minimist": "^1.1.0",
+    "prompt": "^0.2.14"
+  },
+  "bin": {
+    "bm": "bm.js"
   }
 }
