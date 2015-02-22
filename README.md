@@ -3,7 +3,7 @@ NodeJS wrapper for Beeminder API. Created for integration with [Complice](https:
 
 BeeminderJS is designed for use within NodeJS apps, although it also works in a very basic rudimentary way from command-line.
 
-## install to your node project
+## Install to your node project
 
 ```bash
 npm install --save beeminder
@@ -29,11 +29,12 @@ bm.createDatapoint('goalslug', {
   timestamp: new Date("2015-02-21").valueOf() // {type: Number, default: now},
   comment: 'updated readme',
   sendmail: true, // if you want the user to be emailed
-  requestid: 'uniqueIdRightHereOhYeahNobodyElseWillEverUseThisOne', // allows you to run command again without creating duplicate datapoints
+  // requestid allows you to run command again without creating duplicate datapoints
+  requestid: 'thisHasToBeAlphanumericWhichIsWhyThereAreNoSpaces',
 }, function (err, result) {...})
 ```
 
-## install as a command-line tool
+## Install as a command-line tool
 
 ```bash
 sudo npm install --global beeminder
@@ -60,9 +61,12 @@ uvi () {
   bm cd complice-uvi 1 "$@"
   t update "$@"
 }
+
+# example
+uvi "UVIs will be posted more frequently because I can now post them from command line :D"
 ```
 
 
 ## todo
 
-- implement other endpoints
+- implement other endpoints (feel free to ask for them or to submit pull requests)
