@@ -37,7 +37,6 @@ module.exports = function (auth_token) {
 
   this.callApi = function (path, obj, method, callback) {
     data = obj ? querystring.stringify(obj) : '';
-    console.log("data", data);
     var req = {
       url: host + path + "?auth_token="+auth_token + "&" + data,
       method: method,
