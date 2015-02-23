@@ -1,9 +1,13 @@
 var curl = require('curlrequest');
 var querystring = require('querystring');
 
-module.exports = function (auth_token) {
-  host='https://www.beeminder.com/api/v1'
+module.exports = function (token) {
+  if (typeof token == "string") {
+    token = {auth_token: token}
+  }
+  var host = 'https://www.beeminder.com/api/v1'
   var self = this;
+  var tokenString = querystring.stringify(token) + "&";
 
   this.getUser = function (callback) {
     var path = "/users/me.json"
@@ -38,7 +42,7 @@ module.exports = function (auth_token) {
   this.callApi = function (path, obj, method, callback) {
     data = obj ? querystring.stringify(obj) : '';
     var req = {
-      url: host + path + "?auth_token="+auth_token + "&" + data,
+      url: host + path + "?" + tokenString + data,
       method: method,
     };
     curl.request(req, callback);
