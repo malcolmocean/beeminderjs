@@ -46,6 +46,7 @@ bm # run this once to ensure you're authenticated
 
 ```bash
 bm user
+bm status # outputs a list of goals sorted by derail time
 bm goal <goalslug>
 bm datapoints <goalslug>
 bm createdatapoint <goalslug> <value> [<optional comment, in quotes if it has a space>]

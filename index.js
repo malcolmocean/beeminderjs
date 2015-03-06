@@ -14,6 +14,15 @@ module.exports = function (token) {
     self.callApi(path, null, 'GET', callback)
   }
 
+  this.getUserSkinny = function (callback) {
+    var path = "/users/me.json"
+    var params = {
+      diff_since: 0,
+      skinny: true,
+    }
+    self.callApi(path, params, 'GET', callback)
+  }
+
   this.getGoal = function (goalname, callback) {
     var path = '/users/me/goals/'+goalname+'.json'
     self.callApi(path, null, 'GET', callback)
@@ -34,9 +43,18 @@ module.exports = function (token) {
     */
   this.createDatapoint = function (goalname, params, callback) {
     var path = '/users/me/goals/'+goalname+'/datapoints.json'
-    // not using object literal notation because it causes
-    // querystring to insert 'param=' if param is undefined
     self.callApi(path, params, 'POST', callback)
+  }
+
+  /** params = {
+    *     amount: Number, // in USD
+    *     [note]: String, // An explanation of why the charge was made.
+    *     [dryrun]: Boolean, // (if true, JSON returned as normal but no actual charge)
+    *   }
+    */
+  this.charge = function (params, callback) {
+    var path = '/charges.json'
+    self.callApi(path, params, 'POST', callback);
   }
 
   this.callApi = function (path, obj, method, callback) {

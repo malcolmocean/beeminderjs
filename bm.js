@@ -15,8 +15,22 @@ var exists = fs.existsSync(rc_path);
 var rc = exists && fs.readFileSync(rc_path, 'utf8');
 
 function onErr (err) {
-  console.log(err);
+  console.error(err);
   return 1;
+}
+
+function handleErr(after) {
+  return function (err, result) {
+    if (err) {return onErr(err);}
+    if (!result) {return onErr("no result")}
+    if (result.errors) {
+      for (e in result.errors) {
+        console.error(e);
+      }
+      return 1;
+    }
+    after(result);
+  }
 }
 
 function bmCallback (err, result) {
@@ -41,32 +55,102 @@ function printHelp () {
     console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
 }
 
+function ensureNumber(value) {
+  if (!value || isNaN(parseFloat(value))) {
+    console.error("Incorrect format. Correct format is:")
+    console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
+    process.exit(1);
+  }
+}
+
+function padL (s, n) {
+  return ("                                  " + s).slice(-n);
+}
+
+function padR (s, n) {
+  return (s + "                                     ").slice(0, n);
+}
+
 if (argv.help) {
  printHelp();
 } else if (rc && rc.split("auth_token: ")[1]) {
   var auth_token = rc.split("auth_token: ")[1].trim();
   var bm = Bee(auth_token);
   var command = argv._[0];
-  var goalname = argv.goalname || argv.g || argv._[1];
   if (command == "createdatapoint" || command == "cd") {
+    var goalname = argv.goalname || argv.g || argv._[1];
     var value = argv.value || argv._[2];
     var comment = argv.comment || argv._[3];
-    if (!value || isNaN(parseFloat(value))) {
-      console.error("Incorrect format. Correct format is:")
-      console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
-      process.exit(1);
-    }
+    ensureNumber(value);
     var params = {
       value: parseFloat(value)
     };
     comment && (params.comment = comment);
-    bm.createDatapoint(goalname, params, bmCallback);
+    bm.createDatapoint(goalname, params, handleErr(function (result) {
+      var datapoint = JSON.parse(result);
+      console.log(goalname + " ▶  " + datapoint.canonical);
+    }));
   } else if (command == "goal") {
+    var goalname = argv.goalname || argv.g || argv._[1];
     bm.getGoal(goalname, bmCallback);
+  } else if (command == "status") {
+    var goalname = argv.goalname || argv.g || argv._[1];
+    bm.getUserSkinny(handleErr(function (result) {
+      var user = JSON.parse(result);
+
+      var goals = user.goals;
+      goals.sort(function (a, b) {
+        return a.losedate - b.losedate;
+      });
+
+      var simplegoals = [];
+      var lines = [];
+      lines.push("-----------------------------------------------------------------");
+      var next24h = true;
+      for (var i in goals) {
+        var goal = goals[i];
+        simplegoals.push({
+          title: goal.title,
+          slug: goal.slug,
+          delta_text: goal.delta_text,
+          losedate: goal.losedate
+        });
+        var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
+        var deraildays = Math.floor(derailsecs/(60*60*24));
+        derailsecs %= (60*60*24);
+        var derailhours = Math.floor(derailsecs/(60*60));
+        derailsecs %= (60*60);
+        var derailmins = Math.floor(derailsecs/60);
+        derailsecs %= 60;
+        if (goal.losedate - Math.ceil(Date.now()/1000) > (18*60*60) && next24h) {
+          lines.push("-----------------------------------------------------------------");
+          next24h = false;
+        }
+        var derailtime = goal.limsum.replace(" 0 days", " " + (derailhours ? derailhours + " hours"  :
+                  derailmins + " mins")).replace(/(.*? )/, function (match) {return padL(match, 8)})
+        lines.push("  " + user.username + "/" + padR(goal.slug, 16) + padR(goal.delta_text, 22) + derailtime);
+      }
+      lines.push("-----------------------------------------------------------------");
+      for (var l in lines) {
+        console.log(lines[l]);
+      }
+    }));
   } else if (command == "datapoints") {
+    var goalname = argv.goalname || argv.g || argv._[1];
     bm.getDatapoints(goalname, bmCallback);
   } else if (command == "user") {
     bm.getUser(bmCallback);
+  } else if (command == "charge") {
+    var amount = argv.amount || argv._[1];
+    var note = argv.note || argv._[2];
+    var dryrun = argv.dryrun || argv._[3];
+    ensureNumber(amount);
+    params = {
+      amount: parseFloat(amount)
+    }
+    note && (params.note = note);
+    dryrun && (params.dryrun = true);
+    bm.charge(params, bmCallback);
   } else {
     printHelp();
   }
