@@ -35,7 +35,7 @@ function handleErr(after) {
 
 function bmCallback (err, result) {
   if (err) {return onErr(err);}
-  console.log("Successfully executed command: \n", JSON.parse(result));
+  console.log("Successfully executed command: \n", result);
 }
 
 function printHelp () {
@@ -55,20 +55,20 @@ function printHelp () {
     console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
 }
 
-function ensureNumber(value) {
-  if (!value || isNaN(parseFloat(value))) {
-    console.error("Incorrect format. Correct format is:")
-    console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
-    process.exit(1);
-  }
-}
-
 function padL (s, n) {
   return ("                                  " + s).slice(-n);
 }
 
 function padR (s, n) {
   return (s + "                                     ").slice(0, n);
+}
+
+function makeid (n) {
+  var longId = '';
+  for (var i = 0; i <= n/14; i++) {
+    longId += (Math.random() + 1).toString(36).substr(2);
+  }
+  return longId.substring(0, n);
 }
 
 if (argv.help) {
@@ -81,23 +81,59 @@ if (argv.help) {
     var goalname = argv.goalname || argv.g || argv._[1];
     var value = argv.value || argv._[2];
     var comment = argv.comment || argv._[3];
-    ensureNumber(value);
+    var id = argv.id || argv._[4];
+    if (!goalname || value == undefined) {
+      console.error("Incorrect format. Correct format is:")
+      console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
+      process.exit(1);
+    }
+    // ensureNumber(value);
+    if (value && isNaN(parseFloat(value)) && !comment) {
+      comment = value;
+      value = 1;
+    }
     var params = {
       value: parseFloat(value)
     };
     comment && (params.comment = comment);
-    bm.createDatapoint(goalname, params, handleErr(function (result) {
-      var datapoint = JSON.parse(result);
+    id && (params.requestid = id);
+    bm.createDatapoint(goalname, params, handleErr(function (datapoint) {
       console.log(goalname + " ▶  " + datapoint.canonical);
     }));
+  } else if (command == "updatedatapoint") {
+    var goalname = argv.goalname || argv.g || argv._[1];
+    var value = argv.value || argv._[2];
+    var comment = argv.comment || argv._[3];
+    var id = argv.id || argv._[4];
+    if (!id) {
+      id = makeid(10);
+      console.log("random id generated: " + id);
+    }
+    if (!goalname || value == undefined) {
+      console.error("Incorrect format. Correct format is:")
+      console.log("\tbm createdatapoint <goalslug> <value> [<optional comment>]")
+      process.exit(1);
+    }
+    // ensureNumber(value);
+    if (value && isNaN(parseFloat(value)) && !comment) {
+      comment = value;
+      value = 1;
+    }
+    var params = {
+      value: parseFloat(value),
+      requestid: id,
+    };
+    comment && (params.comment = comment);
+    bm.updateDatapoint(goalname, params, handleErr(function (datapoint) {
+      console.log(goalname + " ▶  " + datapoint.canonical);
+    }));
+
   } else if (command == "goal") {
     var goalname = argv.goalname || argv.g || argv._[1];
     bm.getGoal(goalname, bmCallback);
   } else if (command == "status") {
     var goalname = argv.goalname || argv.g || argv._[1];
-    bm.getUserSkinny(handleErr(function (result) {
-      var user = JSON.parse(result);
-
+    bm.getUserSkinny(handleErr(function (user) {
       var goals = user.goals;
       goals.sort(function (a, b) {
         return a.losedate - b.losedate;
@@ -144,7 +180,11 @@ if (argv.help) {
     var amount = argv.amount || argv._[1];
     var note = argv.note || argv._[2];
     var dryrun = argv.dryrun || argv._[3];
-    ensureNumber(amount);
+    if (!amount || isNaN(parseFloat(amount))) {
+      console.error("Incorrect format. Correct format is:")
+      console.log("\tbm charge <amount> <note> [<dryrun>]")
+      process.exit(1);
+    }
     params = {
       amount: parseFloat(amount)
     }

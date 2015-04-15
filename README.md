@@ -67,7 +67,6 @@ uvi () {
 uvi "UVIs will be posted more frequently because I can now post them from command line :D"
 ```
 
-
 ## todo
 
 - implement other endpoints (feel free to ask for them or to submit pull requests)
