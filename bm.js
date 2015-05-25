@@ -209,3 +209,5 @@ if (argv.help) {
     });
   });
 }
+
+// http://blog.npmjs.org/post/119317128765/adding-subcommands-to-your-command-line-tool

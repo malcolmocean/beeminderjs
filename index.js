@@ -5,14 +5,19 @@ module.exports = function (token) {
   function wrapCb(callback) {
     return function (curlErrorString, curlResponseString) {
       var err, response;
-      if (curlErrorString) {
-        err = JSON.parse(curlErrorString);
-      } else if (curlResponseString) {
-        response = JSON.parse(curlResponseString);
-        if (response.errors) {
-          err = response.errors;
-          response = null;
+      try {
+        if (curlErrorString) {
+          err = JSON.parse(curlErrorString);
+        } else if (curlResponseString) {
+          response = JSON.parse(curlResponseString);
+          if (response.errors) {
+            err = response.errors;
+            response = null;
+          }
         }
+      } catch (exception) {
+        err = exception;
+        response = null;
       }
       callback(err, response);
     }
