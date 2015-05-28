@@ -20,38 +20,38 @@ module.exports = function (token) {
         response = null;
       }
       callback(err, response);
-    }
+    };
   }
   if (typeof token == "string") {
-    token = {auth_token: token}
+    token = {auth_token: token};
   }
-  var host = 'https://www.beeminder.com/api/v1'
+  var host = 'https://www.beeminder.com/api/v1';
   var self = this;
   var tokenString = querystring.stringify(token) + "&";
 
 
   this.getUser = function (callback) {
-    var path = "/users/me.json"
-    self.callApi(path, null, 'GET', callback)
+    var path = '/users/me.json';
+    self.callApi(path, null, 'GET', callback);
   }
 
   this.getUserSkinny = function (callback) {
-    var path = "/users/me.json"
+    var path = '/users/me.json';
     var params = {
       diff_since: 0,
       skinny: true,
-    }
-    self.callApi(path, params, 'GET', callback)
+    };
+    self.callApi(path, params, 'GET', callback);
   }
 
   this.getGoal = function (goalname, callback) {
-    var path = '/users/me/goals/'+goalname+'.json'
-    self.callApi(path, null, 'GET', callback)
+    var path = '/users/me/goals/'+goalname+'.json';
+    self.callApi(path, null, 'GET', callback);
   }
 
   this.getDatapoints = function (goalname, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints.json'
-    self.callApi(path, null, 'GET', callback)
+    var path = '/users/me/goals/'+goalname+'/datapoints.json';
+    self.callApi(path, null, 'GET', callback);
   }
 
   /** params = {
@@ -63,8 +63,8 @@ module.exports = function (token) {
     *   }
     */
   this.createDatapoint = function (goalname, params, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints.json'
-    self.callApi(path, params, 'POST', callback)
+    var path = '/users/me/goals/'+goalname+'/datapoints.json';
+    self.callApi(path, params, 'POST', callback);
   }
 
   /** params = {
@@ -76,8 +76,8 @@ module.exports = function (token) {
     *   }
     */
   this.updateDatapoint = function (goalname, params, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints/'+params.requestid+'.json'
-    self.callApi(path, params, 'PUT', callback)
+    var path = '/users/me/goals/'+goalname+'/datapoints/'+params.requestid+'.json';
+    self.callApi(path, params, 'PUT', callback);
   }
 
   // this.upsertDatapoint = function (goalname, params, callback) {
@@ -91,7 +91,7 @@ module.exports = function (token) {
     *   }
     */
   this.charge = function (params, callback) {
-    var path = '/charges.json'
+    var path = '/charges.json';
     self.callApi(path, params, 'POST', callback);
   }
 
@@ -104,4 +104,4 @@ module.exports = function (token) {
     curl.request(req, wrapCb(callback));
   }
   return this;
-}
+};
