@@ -3,6 +3,8 @@ NodeJS wrapper for Beeminder API. Created for integration with [Complice](https:
 
 BeeminderJS is designed for use within NodeJS apps, although it also works in a very basic rudimentary way from command-line.
 
+[![bitHound Score](https://www.bithound.io/github/malcolmocean/beeminderjs/badges/score.svg)](https://www.bithound.io/github/malcolmocean/beeminderjs)
+
 ## Install to your node project
 
 ```bash
