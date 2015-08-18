@@ -56,12 +56,23 @@ module.exports = function (token) {
         var simplegoals = [];
         for (var i in goals) {
           var goal = goals[i];
+          var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
+          var deraildays = Math.floor(derailsecs/(60*60*24));
+          derailsecs %= (60*60*24);
+          var derailhours = Math.floor(derailsecs/(60*60));
+          derailsecs %= (60*60);
+          var derailmins = Math.floor(derailsecs/60);
+          derailsecs %= 60;
+          var derailtime = goal.limsum.replace(" 0 days", " " +
+              (derailhours ?  derailhours + " hours" :
+                (derailmins ? derailmins + " mins" :
+                  derailsecs + " secs")));
           simplegoals.push({
             title: goal.title,
             slug: goal.slug,
             delta_text: goal.delta_text,
             losedate: goal.losedate,
-            limsum: goal.limsum,
+            derailtime: derailtime,
           });
         }
         callback(null, {username: user.username, goals: simplegoals});

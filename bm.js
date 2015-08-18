@@ -139,20 +139,11 @@ if (argv.help) {
       var next24h = true;
       for (var i in user.goals) {
         var goal = user.goals[i];
-        var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
-        var deraildays = Math.floor(derailsecs/(60*60*24));
-        derailsecs %= (60*60*24);
-        var derailhours = Math.floor(derailsecs/(60*60));
-        derailsecs %= (60*60);
-        var derailmins = Math.floor(derailsecs/60);
-        derailsecs %= 60;
         if (goal.losedate - Math.ceil(Date.now()/1000) > (18*60*60) && next24h) {
           lines.push("-----------------------------------------------------------------");
           next24h = false;
         }
-        var derailtime = goal.limsum.replace(" 0 days", " " + (derailhours ? derailhours + " hours"  :
-                  derailmins + " mins")).replace(/(.*? )/, pad8);
-        lines.push("  " + user.username + "/" + padR(goal.slug, 16) + padR(goal.delta_text, 22) + derailtime);
+        lines.push("  " + user.username + "/" + padR(goal.slug, 16) + padR(goal.delta_text, 22) + goal.derailtime.replace(/(.*? )/, pad8));
       }
       lines.push("-----------------------------------------------------------------");
       for (var l in lines) {
