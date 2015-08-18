@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 var Bee = require('./');
-var sys = require('sys');
+var sys = require('sys'); // looks like this can be removed
 var exec = require('child_process').exec;
 var prompt = require('prompt');
 var fs = require('fs');
@@ -10,7 +10,6 @@ var argv = require('minimist')(process.argv.slice(2));
 var userhome = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 var rc_path = userhome+"/.bmndrrc";
 
-fs = require('fs');
 var exists = fs.existsSync(rc_path);
 var rc = exists && fs.readFileSync(rc_path, 'utf8');
 
@@ -133,25 +132,13 @@ if (argv.help) {
     bm.getGoal(goalname, bmCallback);
   } else if (command == "status") {
     var goalname = argv.goalname || argv.g || argv._[1];
-    bm.getUserSkinny(handleErr(function (user) {
-      var goals = user.goals;
-      goals.sort(function (a, b) {
-        return a.losedate - b.losedate;
-      });
-
-      var simplegoals = [];
+    bm.getStatus(handleErr(function (user) {
       var lines = [];
       lines.push("-----------------------------------------------------------------");
-      var next24h = true;
       function pad8 (match) {return padL(match, 8);}
-      for (var i in goals) {
-        var goal = goals[i];
-        simplegoals.push({
-          title: goal.title,
-          slug: goal.slug,
-          delta_text: goal.delta_text,
-          losedate: goal.losedate
-        });
+      var next24h = true;
+      for (var i in user.goals) {
+        var goal = user.goals[i];
         var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
         var deraildays = Math.floor(derailsecs/(60*60*24));
         derailsecs %= (60*60*24);

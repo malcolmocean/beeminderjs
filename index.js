@@ -44,6 +44,31 @@ module.exports = function (token) {
     self.callApi(path, params, 'GET', callback);
   }
 
+  this.getStatus = function (callback) {
+    self.getUserSkinny(function (err, user) {
+      if (err) {
+        callback(err);
+      } else {
+        var goals = user.goals;
+        goals.sort(function (a, b) {
+          return a.losedate - b.losedate;
+        });
+        var simplegoals = [];
+        for (var i in goals) {
+          var goal = goals[i];
+          simplegoals.push({
+            title: goal.title,
+            slug: goal.slug,
+            delta_text: goal.delta_text,
+            losedate: goal.losedate,
+            limsum: goal.limsum,
+          });
+        }
+        callback(null, {username: user.username, goals: simplegoals});
+      }
+    });
+  }
+
   this.getGoal = function (goalname, callback) {
     var path = '/users/me/goals/'+goalname+'.json';
     self.callApi(path, null, 'GET', callback);
