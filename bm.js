@@ -72,6 +72,8 @@ function makeid (n) {
 
 if (argv.help) {
  printHelp();
+} else if (argv.logo || argv._ && argv._[0] === 'logo') {
+  Bee.printLogo();
 } else if (rc && rc.split("auth_token: ")[1]) {
   var auth_token = rc.split("auth_token: ")[1].trim();
   var bm = Bee(auth_token);

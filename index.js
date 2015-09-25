@@ -5,7 +5,7 @@ module.exports = function (token) {
   function wrapCb(callback) {
     return function (curlErrorString, curlResponseString) {
       var err, response;
-      try {
+      try { // "Couldn't resolve host. The given remote host was not resolved." means offline
         if (curlErrorString) {
           err = JSON.parse(curlErrorString);
         } else if (curlResponseString) {
@@ -141,3 +141,4 @@ module.exports = function (token) {
   }
   return this;
 };
+module.exports.printLogo = require('./asciilogo');
