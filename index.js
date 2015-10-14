@@ -80,13 +80,44 @@ module.exports = function (token) {
     });
   }
 
-  this.getGoal = function (goalname, callback) {
-    var path = '/users/me/goals/'+goalname+'.json';
+  this.getGoal = function (slug, callback) {
+    var path = '/users/me/goals/'+slug+'.json';
     self.callApi(path, null, 'GET', callback);
   }
 
-  this.getDatapoints = function (goalname, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints.json';
+  /**   slug is kept as a top level param to be more consistent with
+    * the other methods
+    *   params = {
+    *     title (string)
+    *     goal_type (string)
+    *     goaldate (number or null)
+    *     goalval (number or null)
+    *     rate (number or null)
+    *     initval (number): Initial value for today’s date. Default: 0.
+    *     [panic] (number)
+    *     [secret] (boolean)
+    *     [datapublic] (boolean)
+    *     dryrun (boolean). Pass this to test the endpoint without actually creating a goal. Defaults to false.
+    *     Exactly two out of three of goaldate, goalval, and rate are required.
+    *   }
+    */
+  this.createGoal = function (slug, params, callback) {
+    var path = '/users/me/goals.json'
+    var n = 0;
+    if (params.goaldate) {n++;}
+    if (params.goalval) {n++;}
+    if (params.rate) {n++;}
+    if (n !== 2) {
+      return callback({err: 'Invalid input. Required: 2 of [goaldate, goalval, rate]. Provided: ' + n})
+    }
+    if (!params.slug) {
+      params.slug = slug;
+    }
+    self.callApi(path, params, 'POST', callback);
+  }
+
+  this.getDatapoints = function (slug, callback) {
+    var path = '/users/me/goals/'+slug+'/datapoints.json';
     self.callApi(path, null, 'GET', callback);
   }
 
@@ -98,8 +129,8 @@ module.exports = function (token) {
     *     requestid: {type: String.alphanumeric},
     *   }
     */
-  this.createDatapoint = function (goalname, params, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints.json';
+  this.createDatapoint = function (slug, params, callback) {
+    var path = '/users/me/goals/'+slug+'/datapoints.json';
     self.callApi(path, params, 'POST', callback);
   }
 
@@ -111,14 +142,10 @@ module.exports = function (token) {
     *     requestid: {type: String.alphanumeric, required: true}, // required for update & upsert
     *   }
     */
-  this.updateDatapoint = function (goalname, params, callback) {
-    var path = '/users/me/goals/'+goalname+'/datapoints/'+params.requestid+'.json';
+  this.updateDatapoint = function (slug, params, callback) {
+    var path = '/users/me/goals/'+slug+'/datapoints/'+params.requestid+'.json';
     self.callApi(path, params, 'PUT', callback);
   }
-
-  // this.upsertDatapoint = function (goalname, params, callback) {
-
-  // }
 
   /** params = {
     *     amount: Number, // in USD

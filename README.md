@@ -24,6 +24,8 @@ bm.getUser(function (err, result) {
 
 bm.getGoal('goalslug', function (err, result) {...})
 
+bm.createGoal('goalslug', params, function (err, result) {...})
+
 bm.getDatapoints('goalslug', function (err, result) {...})
 
 bm.createDatapoint('goalslug', {

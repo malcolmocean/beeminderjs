@@ -132,6 +132,19 @@ if (argv.help) {
   } else if (command == "goal") {
     var goalname = argv.goalname || argv.g || argv._[1];
     bm.getGoal(goalname, bmCallback);
+  } else if (command == "creategoal") {
+    var params = {};
+    params.slug = argv.goalname || argv.slug || argv.g || argv._[1];
+    params.title = argv.title || params.slug;
+    params.goal_type = argv.goal_type || 'hustler';
+    params.goaldate = argv.goaldate;
+    params.goalval = argv.goalval;
+    params.rate = argv.rate;
+    if (argv.panic) {params.panic = parseInt(argv.panic);}
+    if (argv.dryrun) {params.dryrun = true;}
+    if (argv.secret) {params.secret = true;}
+    if (argv.datapublic) {params.datapublic = true;}
+    bm.createGoal(params.slug, params, bmCallback);
   } else if (command == "status") {
     var goalname = argv.goalname || argv.g || argv._[1];
     bm.getStatus(handleErr(function (user) {
