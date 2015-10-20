@@ -17,7 +17,7 @@ module.exports = function (token) {
         }
       } catch (exception) {
         err = exception;
-        response = null;
+        response = curlErrorString || curlResponseString;
       }
       callback(err, response);
     };
@@ -164,6 +164,7 @@ module.exports = function (token) {
       url: host + path + "?" + tokenString + data,
       method: method,
     };
+    console.log("req.url", req.url);
     curl.request(req, wrapCb(callback));
   }
   return this;
