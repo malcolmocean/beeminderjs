@@ -33,7 +33,7 @@ module.exports = function (token) {
   this.getUser = function (callback) {
     var path = '/users/me.json';
     self.callApi(path, null, 'GET', callback);
-  }
+  };
 
   this.getUserSkinny = function (callback) {
     var path = '/users/me.json';
@@ -42,7 +42,7 @@ module.exports = function (token) {
       skinny: true,
     };
     self.callApi(path, params, 'GET', callback);
-  }
+  };
 
   this.getStatus = function (callback) {
     self.getUserSkinny(function (err, user) {
@@ -78,12 +78,12 @@ module.exports = function (token) {
         callback(null, {username: user.username, goals: simplegoals});
       }
     });
-  }
+  };
 
   this.getGoal = function (slug, callback) {
     var path = '/users/me/goals/'+slug+'.json';
     self.callApi(path, null, 'GET', callback);
-  }
+  };
 
   /**   slug is kept as a top level param to be more consistent with
     * the other methods
@@ -114,12 +114,12 @@ module.exports = function (token) {
       params.slug = slug;
     }
     self.callApi(path, params, 'POST', callback);
-  }
+  };
 
   this.getDatapoints = function (slug, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints.json';
     self.callApi(path, null, 'GET', callback);
-  }
+  };
 
   /** params = {
     *     value: {type: Number, required: true},
@@ -132,7 +132,7 @@ module.exports = function (token) {
   this.createDatapoint = function (slug, params, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints.json';
     self.callApi(path, params, 'POST', callback);
-  }
+  };
 
   /** params = {
     *     value: {type: Number, required: true},
@@ -145,7 +145,7 @@ module.exports = function (token) {
   this.updateDatapoint = function (slug, params, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints/'+params.requestid+'.json';
     self.callApi(path, params, 'PUT', callback);
-  }
+  };
 
   /** params = {
     *     amount: Number, // in USD
@@ -156,7 +156,7 @@ module.exports = function (token) {
   this.charge = function (params, callback) {
     var path = '/charges.json';
     self.callApi(path, params, 'POST', callback);
-  }
+  };
 
   this.callApi = function (path, obj, method, callback) {
     data = obj ? querystring.stringify(obj) : '';
@@ -166,7 +166,7 @@ module.exports = function (token) {
     };
     console.log("req.url", req.url);
     curl.request(req, wrapCb(callback));
-  }
+  };
   return this;
 };
 module.exports.printLogo = require('./asciilogo');

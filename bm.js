@@ -96,8 +96,8 @@ if (argv.help) {
     var params = {
       value: parseFloat(value)
     };
-    comment && (params.comment = comment);
-    id && (params.requestid = id);
+    if (comment) {params.comment = comment}
+    if (id) {params.requestid = id}
     bm.createDatapoint(goalname, params, handleErr(function (datapoint) {
       console.log(goalname + " ▶  " + datapoint.canonical);
     }));
@@ -124,7 +124,7 @@ if (argv.help) {
       value: parseFloat(value),
       requestid: id,
     };
-    comment && (params.comment = comment);
+    if (comment) {params.comment = comment}
     bm.updateDatapoint(goalname, params, handleErr(function (datapoint) {
       console.log(goalname + " ▶  " + datapoint.canonical);
     }));
@@ -182,8 +182,8 @@ if (argv.help) {
     params = {
       amount: parseFloat(amount)
     };
-    note && (params.note = note);
-    dryrun && (params.dryrun = true);
+    if (note) {params.note = note}
+    if (dryrun) {params.dryrun = true}
     bm.charge(params, bmCallback);
   } else {
     printHelp();
