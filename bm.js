@@ -190,7 +190,14 @@ if (argv.help) {
   }
 } else {
   console.log("No ~/.bmndrrc detected... starting authentication process...");
-  exec('xdg-open https://www.beeminder.com/api/v1/auth_token.json', function () {
+  var open
+  if (process.platform === 'linux') {
+    open = 'xdg-open'
+  } else if (process.platform === 'darwin') {
+    open = 'open'
+  }
+
+  exec(open + ' https://www.beeminder.com/api/v1/auth_token.json', function () {
     console.log("A browser window has opened that will show you your auth_token.\nCopy that and paste it here.");
 
     prompt.start();
