@@ -164,7 +164,6 @@ module.exports = function (token) {
       url: host + path + "?" + tokenString + data,
       method: method,
     };
-    console.log("req.url", req.url);
     curl.request(req, wrapCb(callback));
   };
   return this;
