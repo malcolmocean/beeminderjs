@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 var Bee = require('./');
-var sys = require('sys'); // looks like this can be removed
 var exec = require('child_process').exec;
 var prompt = require('prompt');
 var fs = require('fs');
