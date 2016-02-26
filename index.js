@@ -18,6 +18,12 @@ module.exports = function (token) {
       } catch (exception) {
         err = exception;
         response = curlErrorString || curlResponseString;
+        if (exception == 'SyntaxError - Unexpected token <') {
+          err = {
+            name: 'HTML response received, not JSON',
+            message: response,
+          }
+        }
       }
       callback(err, response);
     };
