@@ -134,6 +134,13 @@ module.exports = function (token) {
     self.callApi(path, params, 'POST', callback);
   };
 
+  /** datapoints: Array of Objects containing the same keys as for `createDatapoint`
+    */
+  this.createDatapoints = function (slug, datapoints, callback) {
+    var path = '/users/me/goals/'+slug+'/datapoints/create_all.json';
+    self.callApi(path, {datapoints: JSON.stringify(datapoints)}, 'POST', callback);
+  };
+
   /** params = {
     *     value: {type: Number, required: true},
     *     timestamp: {type: Number, default: now},
