@@ -78,6 +78,7 @@ module.exports = function (token) {
             slug: goal.slug,
             delta_text: goal.delta_text,
             losedate: goal.losedate,
+            autodata: goal.autodata,
             derailtime: derailtime,
           });
         }
