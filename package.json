@@ -1,6 +1,6 @@
 {
   "name": "beeminder",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "NodeJS wrapper for the Beeminder API",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "api"
   ],
   "author": "Malcolm Ocean <malcolm@malcolmocean.com> (http://malcolmocean.com/)",
-  "license": "GPLv2",
+  "license": "GPL-2.0",
   "bugs": {
     "url": "https://github.com/malcolmocean/beeminderjs/issues"
   },
