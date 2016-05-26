@@ -77,6 +77,7 @@ module.exports = function (token) {
             title: goal.title,
             slug: goal.slug,
             delta_text: goal.delta_text,
+            next_delta: (goal.limsum || '').split(' ')[0]
             losedate: goal.losedate,
             autodata: goal.autodata,
             derailtime: derailtime,
