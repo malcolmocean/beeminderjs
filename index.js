@@ -60,7 +60,6 @@ module.exports = function (token) {
           return a.losedate - b.losedate;
         });
         var simplegoals = [];
-        console.log("goals[0]", goals[0])
         for (var i in goals) {
           var goal = goals[i];
           var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
