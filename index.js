@@ -60,6 +60,7 @@ module.exports = function (token) {
           return a.losedate - b.losedate;
         });
         var simplegoals = [];
+        console.log("goals[0]", goals[0])
         for (var i in goals) {
           var goal = goals[i];
           var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
@@ -81,6 +82,7 @@ module.exports = function (token) {
             losedate: goal.losedate,
             autodata: goal.autodata,
             derailtime: derailtime,
+            lastvalue: goal.last_datapoint && goal.last_datapoint.value,
           });
         }
         callback(null, {username: user.username, goals: simplegoals});

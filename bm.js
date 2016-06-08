@@ -40,6 +40,7 @@ function printHelp () {
   console.log("usage: bm <command> [<args>]\n");
   console.log("The commands currently available are:");
     console.log("\tuser\t\t\t"+"retrieve properties of the user");
+    console.log("\tstatus\t\t\t"+"display all goals sorted by derail time");
     console.log("\tgoal\t\t\t"+"retrieve properties of a goal");
     console.log("\tdatapoints\t\t"+"retrieve all datapoints of a goal");
     console.log("\tcreatedatapoint, cd\t"+"post a new datapoint");
