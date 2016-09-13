@@ -10,20 +10,23 @@ module.exports = function (token) {
           err = JSON.parse(curlErrorString);
         } else if (curlResponseString) {
           response = JSON.parse(curlResponseString);
-          if (response.errors) {
-            err = response.errors;
+          if (response.errors || response.error) {
+            err = response.errors || response.error;
             response = null;
           }
         }
       } catch (exception) {
         err = exception;
         response = curlErrorString || curlResponseString;
-        if (exception == 'SyntaxError - Unexpected token <') {
+        if (/Unexpected token </.test(exception.toString()) || (typeof response == 'string' && response.substr(0,1) == '<')) {
           err = {
-            name: 'HTML response received, not JSON',
+            name: 'HTML response received, not JSON. Beeminder Probably down.',
             message: response,
           }
         }
+      }
+      if (err === 'resource not found') {
+        err += '. probably you mistyped the goal slug!'
       }
       callback(err, response);
     };

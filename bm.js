@@ -170,6 +170,10 @@ if (argv.help) {
     bm.getDatapoints(goalname, bmCallback);
   } else if (command == "user") {
     bm.getUser(bmCallback);
+  } else if (command == "skinny") {
+    bm.getUserSkinny(function (err, result) {
+      console.log("Object.keys(result)", Object.keys(result))
+    });
   } else if (command == "charge") {
     var amount = argv.amount || argv._[1];
     var note = argv.note || argv._[2];
