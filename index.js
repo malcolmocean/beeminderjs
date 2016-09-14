@@ -25,9 +25,6 @@ module.exports = function (token) {
           }
         }
       }
-      if (err === 'resource not found') {
-        err += '. probably you mistyped the goal slug!'
-      }
       callback(err, response);
     };
   }
