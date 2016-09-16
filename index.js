@@ -20,9 +20,22 @@ module.exports = function (token) {
         response = curlErrorString || curlResponseString;
         if (/Unexpected token </.test(exception.toString()) || (typeof response == 'string' && response.substr(0,1) == '<')) {
           err = {
-            name: 'HTML response received, not JSON. Beeminder Probably down.',
+            name: 'HTML response received, not JSON. Beeminder is probably down.',
+            status: 503,
             message: response,
           }
+        } else if (/Unexpected token F/.test(exception.toString()) || (typeof response == 'string' && response.substr(0,1) == 'F')) {
+          err = {
+            name: 'No response received. Beeminder is probably down.',
+            status: 503,
+            message: response,
+          }
+        }
+      }
+      if (err === 'resource not found') {   
+        err = {
+          name: 'Resource not found.',
+          status: 404,
         }
       }
       callback(err, response);
