@@ -17,18 +17,25 @@ module.exports = function (token) {
         }
       } catch (exception) {
         err = exception;
-        response = curlErrorString || curlResponseString;
-        if (/Unexpected token </.test(exception.toString()) || (typeof response == 'string' && response.substr(0,1) == '<')) {
-          err = {
-            name: 'HTML response received, not JSON. Beeminder is probably down.',
-            status: 503,
-            message: response,
+        if (curlErrorString) {
+          if (/resolve/.test(curlErrorString) && /host/.test(curlErrorString)) {
+            err = {
+              name: 'Either Beeminder is down or this script doesn\'t have internet access.',
+              status: 503,
+              message: curlErrorString,
+            }
+          } else {
+            err = {
+              name: 'Some unknown error; treat as Beeminder probably down.',
+              status: 503,
+              message: curlErrorString,
+            }
           }
         } else if (exception.name == 'SyntaxError') {
           err = {
             name: 'Non-JSON response received. Beeminder is probably down.',
             status: 503,
-            message: response,
+            message: curlResponseString,
           }
         }
       }
