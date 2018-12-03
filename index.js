@@ -24,9 +24,9 @@ module.exports = function (token) {
             status: 503,
             message: response,
           }
-        } else if (/Unexpected token F/.test(exception.toString()) || (typeof response == 'string' && response.substr(0,1) == 'F')) {
+        } else if (exception.name == 'SyntaxError') {
           err = {
-            name: 'No response received. Beeminder is probably down.',
+            name: 'Non-JSON response received. Beeminder is probably down.',
             status: 503,
             message: response,
           }
