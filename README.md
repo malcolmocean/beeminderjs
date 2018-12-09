@@ -1,5 +1,5 @@
 # beeminderjs
-NodeJS wrapper for Beeminder API. Created for integration with [Complice](https://complice.co), a productivity app that's more *qualified*-self than quantified-self.
+NodeJS wrapper for the Beeminder API. Created for integration with [Complice](https://complice.co), a productivity app that's more *qualified*-self than quantified-self.
 
 BeeminderJS is designed for use within NodeJS apps, although it also works in a very basic rudimentary way from command-line. I'm open to people contributing new functions to either purpose!
 
@@ -11,7 +11,7 @@ npm install --save beeminder
 
 ### Usage as a library
 
-Now supports both callbacks and promises. All methods return a promise whether you pass it a callback or not.
+Now supports both callbacks and promises. All methods return a promise whether you pass it a callback or not. Refer to the [beeminder API docs](http://api.beeminder.com/#beeminder-api-reference) for information on goal creation parameters or what will be returned when calling these endpoints.
 
 ```javascript
 var beeminder = require('beeminder');
@@ -36,6 +36,13 @@ bm.createDatapoint('goalslug', {
   // requestid allows you to run command again without creating duplicate datapoints
   requestid: 'thisHasToBeAlphanumericWhichIsWhyThereAreNoSpaces',
 }, function (err, result) {...})
+
+bm.createGoal('goalslug', params).then(function () {
+  return bm.createDatapoints('goalslug', [{...}])
+}).then(function () {
+  res.send('Created goal and added datapoints')  
+}).catch(...)
+
 ```
 
 ## Install as a command-line tool
