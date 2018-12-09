@@ -17,6 +17,7 @@ module.exports = function (token) {
         }
       } catch (exception) {
         err = exception;
+        console.log("err", err || curlErrorString)
         if (curlErrorString) {
           if (/resolve/.test(curlErrorString) && /host/.test(curlErrorString)) {
             err = {
@@ -55,10 +56,9 @@ module.exports = function (token) {
   var self = this;
   var tokenString = querystring.stringify(token) + "&";
 
-
   this.getUser = function (callback) {
     var path = '/users/me.json';
-    self.callApi(path, null, 'GET', callback);
+    return self.callApi(path, null, 'GET', callback);
   };
 
   this.getUserSkinny = function (callback) {
@@ -67,11 +67,11 @@ module.exports = function (token) {
       diff_since: 0,
       skinny: true,
     };
-    self.callApi(path, params, 'GET', callback);
+    return self.callApi(path, params, 'GET', callback);
   };
 
   this.getStatus = function (callback) {
-    self.getUserSkinny(function (err, user) {
+    return self.getUserSkinny(function (err, user) {
       if (err) {
         callback(err);
       } else {
@@ -111,7 +111,7 @@ module.exports = function (token) {
 
   this.getGoal = function (slug, callback) {
     var path = '/users/me/goals/'+slug+'.json';
-    self.callApi(path, null, 'GET', callback);
+    return self.callApi(path, null, 'GET', callback);
   };
 
   /**   slug is kept as a top level param to be more consistent with
@@ -142,12 +142,12 @@ module.exports = function (token) {
     if (!params.slug) {
       params.slug = slug;
     }
-    self.callApi(path, params, 'POST', callback);
+    return self.callApi(path, params, 'POST', callback);
   };
 
   this.getDatapoints = function (slug, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints.json';
-    self.callApi(path, null, 'GET', callback);
+    return self.callApi(path, null, 'GET', callback);
   };
 
   /** params = {
@@ -160,14 +160,14 @@ module.exports = function (token) {
     */
   this.createDatapoint = function (slug, params, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints.json';
-    self.callApi(path, params, 'POST', callback);
+    return self.callApi(path, params, 'POST', callback);
   };
 
   /** datapoints: Array of Objects containing the same keys as for `createDatapoint`
     */
   this.createDatapoints = function (slug, datapoints, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints/create_all.json';
-    self.callApi(path, {datapoints: JSON.stringify(datapoints)}, 'POST', callback);
+    return self.callApi(path, {datapoints: JSON.stringify(datapoints)}, 'POST', callback);
   };
 
   /** params = {
@@ -180,7 +180,7 @@ module.exports = function (token) {
     */
   this.updateDatapoint = function (slug, params, callback) {
     var path = '/users/me/goals/'+slug+'/datapoints/'+params.requestid+'.json';
-    self.callApi(path, params, 'PUT', callback);
+    return self.callApi(path, params, 'PUT', callback);
   };
 
   /** params = {
@@ -191,16 +191,27 @@ module.exports = function (token) {
     */
   this.charge = function (params, callback) {
     var path = '/charges.json';
-    self.callApi(path, params, 'POST', callback);
+    return self.callApi(path, params, 'POST', callback);
   };
 
   this.callApi = function (path, obj, method, callback) {
-    data = obj ? querystring.stringify(obj) : '';
-    var req = {
-      url: host + path + "?" + tokenString + data,
-      method: method,
-    };
-    curl.request(req, wrapCb(callback));
+    return new Promise (function (resolve, reject) {
+      data = obj ? querystring.stringify(obj) : '';
+      var req = {
+        url: host + path + "?" + tokenString + data,
+        method: method,
+      };
+      curl.request(req, wrapCb(function (err, result) {
+        if (typeof callback == 'function') {
+          callback(err, result)
+        }
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      }));
+    })
   };
   return this;
 };

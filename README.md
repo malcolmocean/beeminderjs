@@ -1,9 +1,7 @@
 # beeminderjs
 NodeJS wrapper for Beeminder API. Created for integration with [Complice](https://complice.co), a productivity app that's more *qualified*-self than quantified-self.
 
-BeeminderJS is designed for use within NodeJS apps, although it also works in a very basic rudimentary way from command-line.
-
-[![bitHound Score](https://www.bithound.io/github/malcolmocean/beeminderjs/badges/score.svg)](https://www.bithound.io/github/malcolmocean/beeminderjs)
+BeeminderJS is designed for use within NodeJS apps, although it also works in a very basic rudimentary way from command-line. I'm open to people contributing new functions to either purpose!
 
 ## Install to your node project
 
@@ -12,6 +10,8 @@ npm install --save beeminder
 ```
 
 ### Usage as a library
+
+Now supports both callbacks and promises. All methods return a promise whether you pass it a callback or not.
 
 ```javascript
 var beeminder = require('beeminder');
