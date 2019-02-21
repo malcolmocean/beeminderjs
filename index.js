@@ -17,7 +17,6 @@ module.exports = function (token) {
         }
       } catch (exception) {
         err = exception;
-        console.log("err", err || curlErrorString)
         if (curlErrorString) {
           if (/resolve/.test(curlErrorString) && /host/.test(curlErrorString)) {
             err = {
