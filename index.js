@@ -1,5 +1,7 @@
 var curl = require('curlrequest');
 var querystring = require('querystring');
+const version = require('package.json').version
+let useragent = `BeeminderJS/${version}`
 
 module.exports = function (token) {
   function wrapCb(callback) {
@@ -194,13 +196,14 @@ module.exports = function (token) {
   };
 
   this.callApi = function (path, obj, method, callback) {
-    return new Promise (function (resolve, reject) {
+    return new Promise ((resolve, reject) => {
       data = obj ? querystring.stringify(obj) : '';
       var req = {
         url: host + path + "?" + tokenString + data,
         method: method,
+        useragent: useragent,
       };
-      curl.request(req, wrapCb(function (err, result) {
+      curl.request(req, wrapCb((err, result) => {
         if (typeof callback == 'function') {
           callback(err, result)
         }
@@ -215,3 +218,6 @@ module.exports = function (token) {
   return this;
 };
 module.exports.printLogo = require('./asciilogo');
+module.exports.appendToUserAgent = function (ua) {
+  useragent += ' ' + ua
+}
