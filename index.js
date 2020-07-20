@@ -1,6 +1,6 @@
 var curl = require('curlrequest');
 var querystring = require('querystring');
-const version = require('package.json').version
+const version = require('./package.json').version
 let useragent = `BeeminderJS/${version}`
 
 module.exports = function (token) {

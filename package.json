@@ -1,6 +1,6 @@
 {
   "name": "beeminder",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "NodeJS wrapper for the Beeminder API",
   "main": "index.js",
   "scripts": {
