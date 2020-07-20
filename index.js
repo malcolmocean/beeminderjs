@@ -4,7 +4,7 @@ const version = require('./package.json').version
 let useragent = `BeeminderJS/${version}`
 
 module.exports = function (token) {
-  function wrapCb(callback) {
+  function wrapCb(req, callback) {
     return function (curlErrorString, curlResponseString) {
       var err, response;
       try { // "Couldn't resolve host. The given remote host was not resolved." means offline
@@ -46,6 +46,9 @@ module.exports = function (token) {
           name: 'Resource not found.',
           status: 404,
         }
+      }
+      if (err) {
+        err.request = req
       }
       callback(err, response);
     };
@@ -203,7 +206,7 @@ module.exports = function (token) {
         method: method,
         useragent: useragent,
       };
-      curl.request(req, wrapCb((err, result) => {
+      curl.request(req, wrapCb(req, (err, result) => {
         if (typeof callback == 'function') {
           callback(err, result)
         }
