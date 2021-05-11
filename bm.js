@@ -7,7 +7,12 @@ var fs = require('fs');
 var argv = require('minimist')(process.argv.slice(2));
 
 var userhome = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
-var rc_path = userhome+"/.bmndrrc";
+if (process.env.XDG_CONFIG_HOME) {
+  var rc_path = process.env.XDG_CONFIG_HOME+"/.bmndrrc";
+} else {
+  var rc_path = userhome+"/.bmndrrc";
+}
+
 
 var exists = fs.existsSync(rc_path);
 var rc = exists && fs.readFileSync(rc_path, 'utf8');
@@ -193,7 +198,7 @@ if (argv.help) {
     printHelp();
   }
 } else {
-  console.log("No ~/.bmndrrc detected... starting authentication process...");
+  console.log(`No ${rc_path} detected... starting authentication process...`);
   var open;
   if (process.platform === 'linux') {
     open = 'xdg-open';
@@ -209,7 +214,7 @@ if (argv.help) {
       if (err) { return onErr(err); }
       fs.writeFile(rc_path, "[account]\nauth_token: "+result.auth_token+"\n", function (errf) {
         if (errf) { return onErr(errf); }
-        console.log("Successfully wrote auth_token to ~/.bmndrrc");
+        console.log(`Successfully wrote auth_token to ${rc_path}`);
       });
     });
   });
