@@ -70,13 +70,21 @@ function makeid (n) {
   return longId.substring(0, n);
 }
 
+let token
+if (argv.access_token) {
+  token = {access_token: argv.access_token}
+} else if (argv.auth_token) {
+  token = {auth_token: argv.auth_token}
+} else if (rc && rc.split("auth_token: ")[1]) {
+  token = {auth_token: rc.split("auth_token: ")[1].trim()}
+}
+
 if (argv.help) {
  printHelp();
 } else if (argv.logo || argv._ && argv._[0] === 'logo') {
   Bee.printLogo();
-} else if (rc && rc.split("auth_token: ")[1]) {
-  var auth_token = rc.split("auth_token: ")[1].trim();
-  var bm = Bee(auth_token);
+} else if (token) {
+  var bm = Bee(token);
   var command = argv._[0];
   if (command == "createdatapoint" || command == "cd") {
     var goalname = argv.goalname || argv.g || argv._[1];
@@ -170,9 +178,13 @@ if (argv.help) {
     bm.getDatapoints(goalname, bmCallback);
   } else if (command == "user") {
     bm.getUser(bmCallback);
+  } else if (command == "onedatapoint") {
+    bm.getUserOneDatapoint(function (err, result) {
+      console.log("getUserOneDatapoint keys", Object.keys(result))
+    });
   } else if (command == "skinny") {
     bm.getUserSkinny(function (err, result) {
-      console.log("Object.keys(result)", Object.keys(result))
+      console.log("getUserSkinny keys", Object.keys(result))
     });
   } else if (command == "charge") {
     var amount = argv.amount || argv._[1];
