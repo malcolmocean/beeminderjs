@@ -60,18 +60,26 @@ module.exports = function (token) {
   var self = this;
   var tokenString = querystring.stringify(token) + "&";
 
+  this.getUserWithParams = function (params, callback) {
+    return self.callApi('/users/me.json', params || null, 'GET', callback);
+  };
+
   this.getUser = function (callback) {
-    var path = '/users/me.json';
-    return self.callApi(path, null, 'GET', callback);
+    return self.getUserWithParams(null, callback)
+  };
+
+  this.getUserOneDatapoint = function (callback) {
+    return self.getUserWithParams({
+      associations: true,
+      datapoints_count: 1,
+    }, callback);
   };
 
   this.getUserSkinny = function (callback) {
-    var path = '/users/me.json';
-    var params = {
+    return self.getUserWithParams({
       diff_since: 0,
       skinny: true,
-    };
-    return self.callApi(path, params, 'GET', callback);
+    }, callback);
   };
 
   this.getStatus = function (callback) {
