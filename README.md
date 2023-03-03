@@ -11,16 +11,18 @@ npm install --save beeminder
 
 ### Usage as a library
 
-Now supports both callbacks and promises. All methods return a promise whether you pass it a callback or not. Refer to the [beeminder API docs](http://api.beeminder.com/#beeminder-api-reference) for information on goal creation parameters or what will be returned when calling these endpoints.
+As of 2.0.0, promises only. Errors may also be slightly different, due to using `fetch` instead of `curlrequest`.
+
+Refer to the [Beeminder API docs](http://api.beeminder.com/#beeminder-api-reference) for information on goal creation parameters or what will be returned when calling these endpoints.
 
 ```javascript
-var beeminder = require('beeminder');
-var bm = beeminder(auth_token);
+var beeminder = require('beeminder')
+var bm = beeminder(auth_token)
 
 bm.getUser(function (err, result) {
-  console.log(err || result);
+  console.log(err || result)
   // do something
-});
+})
 
 bm.getGoal('goalslug', function (err, result) {...})
 
@@ -66,7 +68,7 @@ bm cd # same as createdatapoint
 
 ### Example
 
-I have the following in `.bash_aliases`, which allows me to post a [user-visible improvement](http://blog.beeminder.com/uvi/) simultaneously to beeminder ([m/complice-uvi](https://beeminder.com/m/complice-uvi)) and twitter ([@compluvi](https://twitter.com/compluvi)). Requires the twitter bash client `t`, available [here](https://github.com/sferik/t).
+I have the following in `.bash_aliases`, which allows me to post a [user-visible improvement](http://blog.beeminder.com/uvi/) simultaneously to beeminder ([m/complice-uvi](https://beeminder.com/m/complice-uvi)) and twitter ([@compluvi](https://twitter.com/compluvi)). Requires the twitter bash client `t`, available [here](https://github.com/sferik/t) (although barely still supported since it uses an old version of Ruby and an unavailable-for-new-apps Twitter API).
 
 ```bash
 uvi () {

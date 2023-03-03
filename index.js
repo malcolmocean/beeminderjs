@@ -1,130 +1,74 @@
-var curl = require('curlrequest');
-var querystring = require('querystring');
+const fetch = require('node-fetch')
+var querystring = require('querystring')
 const version = require('./package.json').version
 let useragent = `BeeminderJS/${version}`
 
 module.exports = function (token) {
-  function wrapCb(req, callback) {
-    return function (curlErrorString, curlResponseString) {
-      var err, response;
-      try { // "Couldn't resolve host. The given remote host was not resolved." means offline
-        if (curlErrorString) {
-          err = JSON.parse(curlErrorString);
-        } else if (curlResponseString) {
-          response = JSON.parse(curlResponseString);
-          if (response.errors || response.error) {
-            err = response.errors || response.error;
-            response = null;
-          }
-        }
-      } catch (exception) {
-        err = exception;
-        if (curlErrorString) {
-          if (/resolve/.test(curlErrorString) && /host/.test(curlErrorString)) {
-            err = {
-              name: 'Either Beeminder is down or this script doesn\'t have internet access.',
-              status: 503,
-              message: curlErrorString,
-            }
-          } else {
-            err = {
-              name: 'Some unknown error; treat as Beeminder probably down.',
-              status: 503,
-              message: curlErrorString,
-            }
-          }
-        } else if (exception.name == 'SyntaxError') {
-          err = {
-            name: 'Non-JSON response received. Beeminder is probably down.',
-            status: 503,
-            message: curlResponseString,
-          }
-        }
-      }
-      if (err === 'resource not found') {   
-        err = {
-          name: 'Resource not found.',
-          status: 404,
-        }
-      }
-      if (err) {
-        err.request = req
-      }
-      callback(err, response);
-    };
-  }
   if (typeof token == "string") {
-    token = {auth_token: token};
+    token = {auth_token: token}
   }
-  var host = 'https://www.beeminder.com/api/v1';
-  var self = this;
-  var tokenString = querystring.stringify(token) + "&";
+  var host = 'https://www.beeminder.com/api/v1'
+  var self = this
+  var tokenString = querystring.stringify(token) + "&"
 
-  this.getUserWithParams = function (params, callback) {
-    return self.callApi('/users/me.json', params || null, 'GET', callback);
-  };
+  this.getUserWithParams = function (params) {
+    return self.callApi('/users/me.json', params || null, 'GET')
+  }
 
-  this.getUser = function (callback) {
-    return self.getUserWithParams(null, callback)
-  };
+  this.getUser = function () {
+    return self.getUserWithParams()
+  }
 
-  this.getUserOneDatapoint = function (callback) {
+  this.getUserOneDatapoint = function () {
     return self.getUserWithParams({
       associations: true,
       datapoints_count: 1,
-    }, callback);
-  };
+    })
+  }
 
-  this.getUserSkinny = function (callback) {
+  this.getUserSkinny = function () {
     return self.getUserWithParams({
       diff_since: 0,
       skinny: true,
-    }, callback);
-  };
+    })
+  }
 
-  this.getStatus = function (callback) {
-    return self.getUserSkinny(function (err, user) {
-      if (err) {
-        callback(err);
-      } else {
-        var goals = user.goals;
-        goals.sort(function (a, b) {
-          return a.losedate - b.losedate;
-        });
-        var simplegoals = [];
-        for (var i in goals) {
-          var goal = goals[i];
-          var derailsecs = goal.losedate - Math.ceil(Date.now()/1000);
-          var deraildays = Math.floor(derailsecs/(60*60*24));
-          derailsecs %= (60*60*24);
-          var derailhours = Math.floor(derailsecs/(60*60));
-          derailsecs %= (60*60);
-          var derailmins = Math.floor(derailsecs/60);
-          derailsecs %= 60;
-          var derailtime = goal.limsum.replace(" 0 days", " " +
-              (derailhours ?  derailhours + " hours" :
-                (derailmins ? derailmins + " mins" :
-                  derailsecs + " secs")));
-          simplegoals.push({
-            title: goal.title,
-            slug: goal.slug,
-            delta_text: goal.delta_text,
-            next_delta: (goal.limsum || '').split(' ')[0],
-            losedate: goal.losedate,
-            autodata: goal.autodata,
-            derailtime: derailtime,
-            lastvalue: goal.last_datapoint && goal.last_datapoint.value,
-          });
-        }
-        callback(null, {username: user.username, goals: simplegoals});
-      }
-    });
-  };
+  this.getStatus = async function () {
+    const user = await self.getUserSkinny()
+    const goals = user.goals
+    goals.sort((a, b) => a.losedate - b.losedate)
+    const simplegoals = []
+    for (let i in goals) {
+      const goal = goals[i]
+      let derailsecs = goal.losedate - Math.ceil(Date.now()/1000)
+      const deraildays = Math.floor(derailsecs/(60*60*24))
+      derailsecs %= (60*60*24)
+      const derailhours = Math.floor(derailsecs/(60*60))
+      derailsecs %= (60*60)
+      const derailmins = Math.floor(derailsecs/60)
+      derailsecs %= 60
+      const derailtime = goal.limsum.replace(" 0 days", " " +
+          (derailhours ?  derailhours + " hours" :
+            (derailmins ? derailmins + " mins" :
+              derailsecs + " secs")))
+      simplegoals.push({
+        title: goal.title,
+        slug: goal.slug,
+        delta_text: goal.delta_text,
+        next_delta: (goal.limsum || '').split(' ')[0],
+        losedate: goal.losedate,
+        autodata: goal.autodata,
+        derailtime: derailtime,
+        lastvalue: goal.last_datapoint && goal.last_datapoint.value,
+      })
+    }
+    return {username: user.username, goals: simplegoals}
+  }
 
-  this.getGoal = function (slug, callback) {
-    var path = '/users/me/goals/'+slug+'.json';
-    return self.callApi(path, null, 'GET', callback);
-  };
+  this.getGoal = function (slug) {
+    const path = '/users/me/goals/'+slug+'.json'
+    return self.callApi(path, null, 'GET')
+  }
 
   /**   slug is kept as a top level param to be more consistent with
     * the other methods
@@ -142,25 +86,25 @@ module.exports = function (token) {
     *     Exactly two out of three of goaldate, goalval, and rate are required.
     *   }
     */
-  this.createGoal = function (slug, params, callback) {
-    var path = '/users/me/goals.json'
-    var n = 0;
-    if (params.goaldate) {n++;}
-    if (params.goalval) {n++;}
-    if (params.rate) {n++;}
+  this.createGoal = async function (slug, params) {
+    const path = '/users/me/goals.json'
+    let n = 0
+    if (params.goaldate) {n++}
+    if (params.goalval) {n++}
+    if (params.rate) {n++}
     if (n !== 2) {
-      return callback({err: 'Invalid input. Required: 2 of [goaldate, goalval, rate]. Provided: ' + n})
+      throw {err: 'Invalid input. Required: 2 of [goaldate, goalval, rate]. Provided: ' + n}
     }
     if (!params.slug) {
-      params.slug = slug;
+      params.slug = slug
     }
-    return self.callApi(path, params, 'POST', callback);
-  };
+    return self.callApi(path, params, 'POST')
+  }
 
-  this.getDatapoints = function (slug, callback) {
-    var path = '/users/me/goals/'+slug+'/datapoints.json';
-    return self.callApi(path, null, 'GET', callback);
-  };
+  this.getDatapoints = function (slug) {
+    const path = '/users/me/goals/'+slug+'/datapoints.json'
+    return self.callApi(path, null, 'GET')
+  }
 
   /** params = {
     *     value: {type: Number, required: true},
@@ -170,17 +114,17 @@ module.exports = function (token) {
     *     requestid: {type: String.alphanumeric},
     *   }
     */
-  this.createDatapoint = function (slug, params, callback) {
-    var path = '/users/me/goals/'+slug+'/datapoints.json';
-    return self.callApi(path, params, 'POST', callback);
-  };
+  this.createDatapoint = function (slug, params) {
+    const path = '/users/me/goals/'+slug+'/datapoints.json'
+    return self.callApi(path, params, 'POST')
+  }
 
   /** datapoints: Array of Objects containing the same keys as for `createDatapoint`
     */
-  this.createDatapoints = function (slug, datapoints, callback) {
-    var path = '/users/me/goals/'+slug+'/datapoints/create_all.json';
-    return self.callApi(path, {datapoints: JSON.stringify(datapoints)}, 'POST', callback);
-  };
+  this.createDatapoints = function (slug, datapoints) {
+    const path = '/users/me/goals/'+slug+'/datapoints/create_all.json'
+    return self.callApi(path, {datapoints: JSON.stringify(datapoints)}, 'POST')
+  }
 
   /** params = {
     *     value: {type: Number, required: true},
@@ -190,10 +134,10 @@ module.exports = function (token) {
     *     requestid: {type: String.alphanumeric, required: true}, // required for update & upsert
     *   }
     */
-  this.updateDatapoint = function (slug, params, callback) {
-    var path = '/users/me/goals/'+slug+'/datapoints/'+params.requestid+'.json';
-    return self.callApi(path, params, 'PUT', callback);
-  };
+  this.updateDatapoint = function (slug, params) {
+    const path = '/users/me/goals/'+slug+'/datapoints/'+params.requestid+'.json'
+    return self.callApi(path, params, 'PUT')
+  }
 
   /** params = {
     *     amount: Number, // in USD
@@ -201,34 +145,85 @@ module.exports = function (token) {
     *     [dryrun]: Boolean, // (if true, JSON returned as normal but no actual charge)
     *   }
     */
-  this.charge = function (params, callback) {
-    var path = '/charges.json';
-    return self.callApi(path, params, 'POST', callback);
-  };
+  this.charge = function (params) {
+    const path = '/charges.json'
+    return self.callApi(path, params, 'POST')
+  }
 
-  this.callApi = function (path, obj, method, callback) {
-    return new Promise ((resolve, reject) => {
-      data = obj ? querystring.stringify(obj) : '';
-      var req = {
-        url: host + path + "?" + tokenString + data,
-        method: method,
-        useragent: useragent,
-      };
-      curl.request(req, wrapCb(req, (err, result) => {
-        if (typeof callback == 'function') {
-          callback(err, result)
-        }
-        if (err) {
-          reject(err)
-        } else {
-          resolve(result)
-        }
-      }));
+  this.callApi = async function (path, obj, method) {
+    const query = obj ? querystring.stringify(obj) : ''
+    // const url = host + '/nope' + path + "?" + tokenString + query
+    const url = host + path + "?" + tokenString + query
+    const details = method == 'GET' ? {headers: {'User-Agent': useragent}} : {
+      method: method,
+      body: obj ? JSON.stringify(obj) : undefined,
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': useragent,
+      },
+    }
+    let error
+    const result = await fetch(url, details).catch(err => {
+      details.url = url
+      error = {
+        name: 'Network error. Either beeminder.js is offline or the Beeminder API is down.',
+        status: 0,
+        request: details,
+      }
+      throw error
     })
-  };
-  return this;
-};
-module.exports.printLogo = require('./asciilogo');
+    details.url = url
+    const resultText = await result.text()
+    let resultJson
+    try {
+      resultJson = JSON.parse(resultText)
+    } catch (err) {
+      error = {
+        name: 'Non-JSON response received. Beeminder is probably down.',
+        status: 503,
+        message: resultText,
+        request: details,
+      }
+      throw error
+    }
+    if (result.status > 300) {
+      error = {
+        name: 'Some unknown error; treat as Beeminder probably down.',
+        status: result.status,
+        message: resultText,
+      }
+    } else if (result.error) {
+      error = result.error
+    }
+    if (!error) {
+      return resultJson
+    } else {
+      error.request = details
+      throw error
+    }
+  }
+  return this
+}
+module.exports.printLogo = require('./asciilogo')
 module.exports.appendToUserAgent = function (ua) {
   useragent += ' ' + ua
 }
+
+
+/* new offline error
+
+FetchError: request to https://www.beeminder.com/api/v1/users/me/goals/pushups/datapoints.json?auth_token=TOKEN&value=10 failed, reason: getaddrinfo EAI_AGAIN www.beeminder.com
+    at ClientRequest.<anonymous> (/home/malcolm/dev/beeminderjs/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:390:28)
+    at TLSSocket.socketErrorListener (node:_http_client:447:9)
+    at TLSSocket.emit (node:events:390:28)
+    at emitErrorNT (node:internal/streams/destroy:157:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:122:3)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  type: 'system',
+  errno: 'EAI_AGAIN',
+  code: 'EAI_AGAIN'
+}
+
+
+*/
