@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 var querystring = require('querystring')
 const version = require('./package.json').version
 let useragent = `BeeminderJS/${version}`
+let ignoreDupes = false
 
 module.exports = function (token) {
   if (typeof token == "string") {
@@ -186,11 +187,13 @@ module.exports = function (token) {
       }
       throw error
     }
-    if (result.status > 300) {
+    if (result.status == 422 && ignoreDupes) { // duplicate request
+      result.status = 200
+    } else if (result.status > 300) {
       error = {
         name: 'Some unknown error; treat as Beeminder probably down.',
         status: result.status,
-        message: resultText,
+        message: resultJson,
       }
     } else if (result.error) {
       error = result.error
@@ -207,6 +210,9 @@ module.exports = function (token) {
 module.exports.printLogo = require('./asciilogo')
 module.exports.appendToUserAgent = function (ua) {
   useragent += ' ' + ua
+}
+module.exports.setIgnoreDupes = function (now=true) {
+  ignoreDupes = now
 }
 
 
